@@ -107,6 +107,11 @@ char *ckxsys = " Amdahl UTS 2.4";
 char *ckxsys = " Pro-3xx Venix v1";
 #endif /* provx1 */
 
+/* Venix86 Version 2.x support from Warner Losh */
+#ifdef VENIX86
+char *ckxsys = " Venix/86 2.x";
+#endif /* VENIX86 */
+
 /* Tower support contributed by John Bray, Auburn, Alabama */
 #ifdef TOWER1
 char *ckxsys = " NCR Tower 1632, OS 1.02";
@@ -270,13 +275,13 @@ Time functions
 #endif /* ft18 */
 
 /* Whether to #include <sys/file.h>... */
-#ifndef PROVX1
+#ifndef VENIX
 #ifndef aegis
 #ifndef XENIX
 #include <sys/file.h>                   /* File information */
 #endif /* xenix */
 #endif /* aegis */
-#endif /* provx1 */
+#endif /* venix */
 
 #ifdef aegis
 #ifdef BSD4
@@ -305,13 +310,13 @@ Time functions
 
 #ifndef UXIII
 #include <sgtty.h>                      /* Set/Get tty modes */
-#ifndef PROVX1
+#ifndef VENIX
 #ifndef V7
 #ifndef BSD41
 #include <sys/time.h>                   /* Clock info (for break generation) */
 #endif /* not bsd41 */
 #endif /* not v7 */
-#endif /* not provx1 */
+#endif /* not venix */
 #endif /* not uxiii */
 
 #ifdef BSD41
@@ -370,13 +375,13 @@ char *initrawq(), *qaddr[2]={0,0};
 /* dftty is the device name of the default device for file transfer */
 /* dfloc is 0 if dftty is the user's console terminal, 1 if an external line */
 
-#ifdef PROVX1
+#ifdef VENIX
     char *dftty = "/dev/com1.dout"; /* Only example so far of a system */
     int dfloc = 1;                  /* that goes in local mode by default */
 #else
     char *dftty = CTTNAM;               /* Remote by default, use normal */
     int dfloc = 0;                      /* controlling terminal name. */
-#endif /* provx1 */
+#endif /* VENIX */
 
     int dfprty = 0;                     /* Default parity (0 = none) */
     int ttprty = 0;                     /* Parity in use. */
@@ -1577,8 +1582,8 @@ ttchk() {
 #ifdef UXIII
     return(inbufc + (ungotn >= 0) );    /* Sys III, Sys V */
 #else
-#ifdef PROVX1
-    x = ioctl(ttyfd, TIOCQCNT, &ttbuf); /* Pro/3xx Venix V.1 */
+#ifdef VENIX
+    x = ioctl(ttyfd, TIOCQCNT, &ttbuf); /* Pro/3xx Venix V.1 / Venix/86 2.x*/
     n = ttbuf.sg_ispeed & 0377;
     return((x < 0) ? 0 : n);
 #else
@@ -1774,7 +1779,7 @@ ttsndb() {
 
     if (ttyfd < 0) return(-1);          /* Not open. */
 
-#ifdef PROVX1
+#ifdef VENIX
     gtty(ttyfd,&ttbuf);                 /* Get current tty flags */
     spd = ttbuf.sg_ospeed;              /* Save speed */
     ttbuf.sg_ospeed = B50;              /* Change to 50 baud */
@@ -1836,7 +1841,7 @@ msleep(m) int m; {
     time_$wait(time_$relative, dur, st);
     return(0);
 #else
-#ifdef PROVX1
+#ifdef VENIX
     if (m <= 0) return(0);
     sleep(-((m * 60 + 500) / 1000));
     return(0);
@@ -1940,7 +1945,9 @@ ztime(s) char **s; {
     *s = ctime( &clock_storage );
 #endif
 
-#ifdef PROVX1
+#ifdef VENIX
+    char *ctime();
+
     int utime[2];                       /* Venix way */
     time(utime);
     *s = ctime(utime);
@@ -2169,7 +2176,7 @@ conoll(s) char *s; {
 conchk() {
     int x; long n;
 
-#ifdef PROVX1
+#ifdef VENIX
     x = ioctl(0, TIOCQCNT, &ttbuf);
     n = ttbuf.sg_ispeed & 0377;
     return((x < 0) ? 0 : n);

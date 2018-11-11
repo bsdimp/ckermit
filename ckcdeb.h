@@ -60,7 +60,7 @@ typedef int SIGTYP;
 typedef int ret_buf[10];
 #endif /* zilog */
 
-#ifdef PROVX1
+#ifdef VENIX
 typedef char CHAR;
 typedef long LONG;
 typedef int void;

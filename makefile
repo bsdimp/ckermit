@@ -25,6 +25,7 @@
 # for DEC Pro-350 with Pro/Venix V1.x, "make provx1"
 # for DEC Pro-350 with Pro/Venix V2.0 (Sys V), "make sys3nid" 
 # for DEC Pro-380 with Pro/Venix V2.0 (Sys V), "make sys3" or "make sys3nid"
+# for DEC Rainbow or IBM XT/AT with Venix/86 V2.0, "make venix86"
 # for Fortune 32:16, For:Pro 1.8, "make ft18"
 # for HP-9000 Series with HP-UX, "make hpux"
 # for IBM 370 Series with IX/370, "make ix370"
@@ -330,9 +331,17 @@ rtu:
 # Requires code-mapping on non-I&D-space 11/23 processor, plus some
 # fiddling to get interrupt targets into resident code section.
 provx1:
-	make wart "CFLAGS= -DPROVX1" "LNKFLAGS= "
-	make wermit "CFLAGS = -DPROVX1 -DDEBUG -DTLOG -md780" \
+	make wart "CFLAGS= -DPROVX1 -DVENIX" "LNKFLAGS= "
+	make wermit "CFLAGS = -DPROVX1 -DVENIX -DDEBUG -DTLOG -md780" \
 		"LNKFLAGS= -u _sleep -lc -md780"
+
+#DEC Rainbow or IBM XT/AT with Venix/86 V2.0
+# Requires separate I/D space and a low, 8k stack. Otherwise
+# simplar to Pro version.
+venix86:
+	make wart "CFLAGS= -DVENIX86 -DVENIX" "LNKFLAGS= "
+	make wermit "CFLAGS = -DVENIX86 -DVENIX -z -i -O" \
+		"LNKFLAGS=-z -i "
 
 #NCR Tower 1632, OS 1.02
 tower1:

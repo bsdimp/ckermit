@@ -67,6 +67,11 @@ char *ckzsys = " Version 7 Unix";
 char *ckzsys = " DEC Pro-3xx/Venix v1";
 #endif
 
+/* 8086/80286 Venturcom Venix/86 2.x */
+#ifdef VENIX86
+char *ckzsys = " Venix/86 v2.x";
+#endif
+
 /* NCR Tower support contributed by John Bray, Auburn, AL. */
 /* Tower OS is like Sys III but with BSD features -- mostly follows BSD. */
 #ifdef TOWER1
@@ -168,7 +173,7 @@ char *WHOCMD = "who ";			/* For seeing who's logged in */
  */
 
 #ifdef FT18
-#define PROVX1
+#define CIE
 #endif
 
 /* Which systems include <sys/file.h>... */
@@ -185,7 +190,7 @@ char *WHOCMD = "who ";			/* For seeing who's logged in */
 #endif
 
 #ifdef FT18
-#undef PROVX1
+#undef CIE
 #endif
 
 /* Some systems define these symbols in include files, others don't... */
@@ -197,7 +202,7 @@ char *WHOCMD = "who ";			/* For seeing who's logged in */
 #define W_OK 2
 #endif
 
-#ifdef PROVX1
+#ifdef VENIX
 #define MAXNAMLEN DIRSIZ		/* Max file name length */
 #endif
 
@@ -216,7 +221,7 @@ char *WHOCMD = "who ";			/* For seeing who's logged in */
 #define MAXNAMLEN 14			/* If still not defined... */
 #endif
 
-#ifdef PROVX1
+#ifdef VENIX
 #define MAXWLD 50			/* Maximum wildcard filenames */
 #else
 #ifdef BSD29
@@ -246,7 +251,7 @@ static char *mtchs[MAXWLD],		/* Matches found for filename */
 /* getppid(), then just kill(0,9)...  */
 
 zkself() {				/* For "bye", but no guarantee! */
-#ifdef PROVX1
+#ifdef VENIX
     return(kill(0,9));
 #else
 #ifdef V7
@@ -796,7 +801,7 @@ struct path {
               struct path *fwd;		/* forward ptr */
             };
 
-#ifdef PROVX1
+#ifdef VENIX
 #define SSPACE 500
 #else
 #ifdef BSD29
