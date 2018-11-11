@@ -555,7 +555,7 @@ extern int mac_getchar (void);
 
 /* We want all characters to be unsigned if the compiler supports it */
 
-#ifdef PROVX1
+#ifdef VENIX
 typedef char CHAR;
 /* typedef long LONG; */
 typedef int void;
@@ -590,7 +590,7 @@ typedef unsigned char CHAR;
 #endif /* C70 */
 #endif /* V7 */
 #endif /* MINIX */
-#endif /* PROVX1 */
+#endif /* VENIX */
 
 #ifdef MAC				/* Macintosh file routines */
 #ifndef CKWART_C			/* But not in "wart"... */

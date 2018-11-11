@@ -584,8 +584,8 @@ _PROTOTYP( struct passwd * getpwent, (void) );
 
 /* Maximum number of filenames for wildcard expansion */
 
-#ifdef PROVX1
-#define MAXWLD 50
+#ifdef VENIX
+#define MAXWLD 50			/* Maximum wildcard filenames */
 #else
 #ifdef pdp11
 #define MAXWLD 50
@@ -734,7 +734,7 @@ extern PID_T getppid();
 #endif /* SVR3 */
 int
 zkself() {				/* For "bye", but no guarantee! */
-#ifdef PROVX1
+#ifdef VENIX
     return(kill(0,9));
 #else
 #ifdef V7
@@ -2691,7 +2691,7 @@ shxfin:					/* Common exit point */
 /* Define the size of the string space for filename expansion. */
 
 #ifndef DYNAMIC
-#ifdef PROVX1
+#ifdef VENIX
 #define SSPACE 500
 #else
 #ifdef BSD29

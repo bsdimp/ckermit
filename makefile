@@ -3009,9 +3009,17 @@ rtus5r3:
 # This almost certainly doesn't work any more.
 provx1:
 	@echo 'Making C-Kermit $(CKVER) for DEC Pro-3xx, Pro/Venix 1.x...'
-	$(MAKE) wart "CFLAGS= -DPROVX1 $(KFLAGS)" "LNKFLAGS= "
-	$(MAKE) wermit "CFLAGS = -DPROVX1 -DNOFILEH -md780" \
+	$(MAKE) wart "CFLAGS= -DPROVX1 -DVENIX $(KFLAGS)" "LNKFLAGS= "
+	$(MAKE) wermit "CFLAGS = -DPROVX1 -DNOFILEH -md780 -DVENIX" \
 		"LNKFLAGS= -u _sleep -lc -md780"
+
+#DEC Rainbow or IBM XT/AT with Venix/86 V2.0
+# Requires separate I/D space and a low, 8k stack. Otherwise
+# simplar to Pro version.
+venix86:
+	make wart "CFLAGS= -DVENIX86 -DVENIX" "LNKFLAGS= "
+	make wermit "CFLAGS = -DVENIX86 -DVENIX -DNOFILEH -z -i -O" \
+		"LNKFLAGS=-z -i "
 
 #Nixdorf Targon/31.
 #AT&T UNIX System V R3, signal() is void rather than int.

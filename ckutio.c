@@ -470,6 +470,10 @@ Time functions
 
 /* Whether to include <sys/file.h> */
 
+#ifdef VENIX				/* VENIX doesn't */
+#define NOFILEH
+#endif /* RTU */
+
 #ifdef RTU				/* RTU doesn't */
 #define NOFILEH
 #endif /* RTU */
@@ -660,7 +664,7 @@ typedef long mflag;
 #else  /* Not AT&T Sys V or POSIX */
 
 #include <sgtty.h>                      /* So we use <sgtty.h> */
-#ifndef PROVX1				/* Now <sys/time.h> ... */
+#ifndef VENIX
 #ifndef V7
 #ifndef BSD41
 #ifndef COHERENT
@@ -668,7 +672,7 @@ typedef long mflag;
 #endif /* COHERENT */
 #endif /* BSD41 */
 #endif /* V7 */
-#endif /* PROVX1 */
+#endif /* VENIX */
 #endif /* SVORPOSIX */
 
 #ifdef PS2AIX10
@@ -780,7 +784,7 @@ char *initrawq(), *qaddr[2]={0,0};
 /* dfloc is 0 if dftty is the user's console terminal, 1 if an external line */
 
 #ifndef DFTTY
-#ifdef PROVX1
+#ifdef VENIX
     char *dftty = "/dev/com1.dout"; /* Only example so far of a system */
     char *dfmdm = "none";
     int dfloc = 1;                  /* that goes in local mode by default */
@@ -788,7 +792,7 @@ char *initrawq(), *qaddr[2]={0,0};
     char *dftty = CTTNAM;               /* Remote by default, use normal */
     char *dfmdm = "none";
     int dfloc = 0;                      /* controlling terminal name. */
-#endif /* PROVX1 */
+#endif /* VENIX */
 #else
     char *dftty = DFTTY;		/* Default location specified on */
     char *dfmdm = "none";		/* command line. */
@@ -847,11 +851,11 @@ static int jcshell = -1;		/* And flag for result */
   BREAKNULS is defined for systems that simulate sending a BREAK signal
   by sending a bunch of NUL characters at low speed.
 */
-#ifdef PROVX1
+#ifdef VENIX
 #ifndef BREAKNULS
 #define BREAKNULS
 #endif /* BREAKNULS */
-#endif /* PROVX1 */
+#endif /* VENIX */
 
 #ifdef V7
 #ifndef BREAKNULS
@@ -1017,9 +1021,9 @@ static char escchr;                     /* Escape or attn character */
 #endif /* ATTSV */
 #endif /* BSD44ORPOSIX */
 
-#ifdef PROVX1
+#ifdef VENIX
   static struct sgttyb ttbuf;
-#endif /* PROVX1 */
+#endif /* VENIX */
 
 #ifdef ultrix
 /* do we really need this? */
@@ -5621,8 +5625,8 @@ in_chk(fd) int fd; {
     if (x != sizeof(int)) n = 0;
 #endif /* MINIX */
 #else /* Not V7 */
-#ifdef PROVX1
-    x = ioctl(fd, TIOCQCNT, &ttbuf);	/* DEC Pro/3xx Venix V.1 */
+#ifdef VENIX
+    x = ioctl(fd, TIOCQCNT, &ttbuf); /* Pro/3xx Venix V.1 / Venix/86 2.x*/
     n = ttbuf.sg_ispeed & 0377;
     if (x < 0) n = 0;
 #else
@@ -5675,7 +5679,7 @@ in_chk(fd) int fd; {
 #endif /* CK_POLL */
 #endif /* SELECT */
 #endif /* RDCHK */
-#endif /* PROVX1 */
+#endif /* VENIX1 */
 #endif /* V7 */
 #endif /* FIONREAD */
 
@@ -6255,9 +6259,9 @@ sndbrk(msec) int msec; {
 #define BSDBREAK
 #endif /* COHERENT */
 
-#ifdef PROVX1
+#ifdef VENIX
     char spd;
-#endif /* PROVX1 */
+#endif /* VENIX */
 
     debug(F101,"ttsndb ttyfd","",ttyfd);
     if (ttyfd < 0) return(-1);          /* Not open. */
@@ -6273,7 +6277,7 @@ sndbrk(msec) int msec; {
     debug(F101,"sndbrk POSIX","",msec);
     return(tcsendbreak(ttyfd,msec / 375));
 #else
-#ifdef PROVX1
+#ifdef VENIX
     gtty(ttyfd,&ttbuf);                 /* Get current tty flags */
     spd = ttbuf.sg_ospeed;              /* Save speed */
     ttbuf.sg_ospeed = B50;              /* Change to 50 baud */
@@ -6330,7 +6334,7 @@ sndbrk(msec) int msec; {
 #endif /* BSDBREAK */
 #endif /* ATTSV */
 #endif /* aegis */
-#endif /* PROVX1 */
+#endif /* VENIX1 */
 #endif /* POSIX */
 }
 
@@ -6448,7 +6452,7 @@ msleep(m) int m; {
     time_$wait(time_$relative, dur, st);
     return(0);
 #else
-#ifdef PROVX1
+#ifdef VENIX
     debug(F101,"msleep Venix","",m);
     if (m <= 0) return(0);
     sleep(-((m * 60 + 500) / 1000));
@@ -6541,7 +6545,7 @@ msleep(m) int m; {
 #endif /* MSLFTIME */
 #endif /* ATTSV */
 #endif /* NAP */
-#endif /* PROVX1 */
+#endif /* VENIX */
 #endif /* aegis */
 #endif /* SELECT */
 #endif /* CK_POLL */
@@ -6600,7 +6604,7 @@ ztime(s) char **s; {
     clock_storage = time( (long *) 0 );
     *s = ctime( &clock_storage );
 #else
-#ifdef PROVX1				/* Venix 1.0 way */
+#ifdef VENIX				/* Venix 1.0 way */
     int utime[2];
     time(utime);
     *s = ctime(utime);
@@ -6636,7 +6640,7 @@ ztime(s) char **s; {
 #endif /* ZTIMEV7 */
 #endif /* MINIX */
 #endif /* BSD42 */
-#endif /* PROVX1 */
+#endif /* VENIX1 */
 #endif /* SVORPOSIX */
 }
 
