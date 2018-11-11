@@ -101,7 +101,7 @@ typedef int SIGTYP;
 /* typedef int ret_buf[10]; (apparently duplicated in setret.h) */
 #endif /* zilog */
 
-#ifdef PROVX1
+#ifdef VENIX
 typedef char CHAR;
 typedef long LONG;
 typedef int void;
