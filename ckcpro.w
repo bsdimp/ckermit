@@ -1,5 +1,5 @@
 char *protv =                                                     /* -*-C-*- */
-"C-Kermit Protocol Module 8.0.158, 11 Sep 2002";
+"C-Kermit Protocol Module 9.0.160, 16 Oct 2009";
 
 int kactive = 0;			/* Kermit protocol is active */
 
@@ -10,7 +10,7 @@ int kactive = 0;			/* Kermit protocol is active */
   Author: Frank da Cruz <fdc@columbia.edu>,
   Columbia University Academic Information Systems, New York City.
 
-  Copyright (C) 1985, 2004,
+  Copyright (C) 1985, 2009,
     Trustees of Columbia University in the City of New York.
     All rights reserved.  See the C-Kermit COPYING.TXT file or the
     copyright text in the ckcmai.c module for disclaimer and permissions.
@@ -147,6 +147,7 @@ _PROTOTYP( int cmdsrc, (void) );
 #endif /* TCPSOCKET */
 
   extern int cxseen, czseen, server, srvdis, local, displa, bctu, bctr, bctl;
+  extern int bctf;
   extern int quiet, tsecs, parity, backgrd, nakstate, atcapu, wslotn, winlo;
   extern int wslots, success, xitsta, rprintf, discard, cdtimo, keep, fdispla;
   extern int timef, stdinf, rscapu, sendmode, epktflg, epktrcvd, epktsent;
@@ -230,7 +231,7 @@ wheremsg() {
 		    printf(" SENT: [%s]",sfspec);
 		    if (srfspec)
 		      printf(" To: [%s]",srfspec);
-		    printf(" (%s)\n", success ? "OK" : "FAILED");
+		    printf(" (%s)\r\n", success ? "OK" : "FAILED");
 		}
 		break;
 	      case 'r':
@@ -239,7 +240,7 @@ wheremsg() {
 		    printf(" RCVD: [%s]",rrfspec);
 		    if (rfspec)
 		      printf(" To: [%s]",rfspec);
-		    printf(" (%s)\n", success ? "OK" : "FAILED");
+		    printf(" (%s)\r\n", success ? "OK" : "FAILED");
 		}
 	    }
 	} else if (n > 1) {
@@ -249,7 +250,7 @@ wheremsg() {
 		    printf(" SENT: (%d files)",n);
 		    if (srfspec)
 		      printf(" Last: [%s]",srfspec);
-		    printf(" (%s)\n", success ? "OK" : "FAILED");
+		    printf(" (%s)\r\n", success ? "OK" : "FAILED");
 		}
 		break;
 	      case 'r':
@@ -258,14 +259,14 @@ wheremsg() {
 		    printf(" RCVD: (%d files)",n);
 		    if (rfspec)
 		      printf(" Last: [%s]",rfspec);
-		    printf(" (%s)\n", success ? "OK" : "FAILED");
+		    printf(" (%s)\r\n", success ? "OK" : "FAILED");
 		}
 	    }
 	} else if (n == 0) {
 	    if (myjob == 's')
-	      printf(" SENT: (0 files)          \n");
+	      printf(" SENT: (0 files)          \r\n");
 	    else if (myjob == 'r' || myjob == 'v')
-	      printf(" RCVD: (0 files)          \n");
+	      printf(" RCVD: (0 files)          \r\n");
 	}
     }
 }
@@ -458,17 +459,22 @@ x {					/* Enter server mode */
 a {
     int b1 = 0, b2 = 0;
     if (!data) TINIT;			/* "ABEND" -- Tell other side. */
+
+    if (!bctf) {		     /* Block check 3 forced on all packets */
 #ifndef pdp11
-    if (epktflg) {			/* If because of E-PACKET command */
-	b1 = bctl; b2 = bctu;		/* Save block check type */
-	bctl = bctu = 1;		/* set it to 1 */
-    }
+	if (epktflg) {			/* If because of E-PACKET command */
+	    b1 = bctl; b2 = bctu;	/* Save block check type */
+	    bctl = bctu = 1;		/* set it to 1 */
+	}
 #endif /* pdp11 */
+    }
     errpkt((CHAR *)"User cancelled");	/* Send the packet */
+    if (!bctf) {		     /* Block check 3 forced on all packets */
 #ifndef pdp11
-    if (epktflg) {			/* Restore the block check */
-	epktflg = 0;
-	bctl = b1; bctu = b2;
+	if (epktflg) {			/* Restore the block check */
+	    epktflg = 0;
+	    bctl = b1; bctu = b2;
+	}
     }
 #endif /* pdp11 */
     success = 0;
@@ -891,7 +897,7 @@ a {
 		}
 	    }
 	} else {			/* User doesn't want message */
-	    p =zgtdir();
+	    p = zgtdir();
 	    if (!p) p = "";
 	    success = (*p) ? 1 : 0;
 	    ack1((CHAR *)p);
@@ -1069,7 +1075,7 @@ a {
 	xxscreen(SCR_TC,0,0L,"");	/* Display */
 	doclean(1);			/* Clean up files, etc */
 #ifdef DEBUG
-	debug(F100,"C-Kermit BYE - Loggin out...","",0);
+	debug(F100,"C-Kermit BYE - Logging out...","",0);
 	zclose(ZDFILE);
 #endif /* DEBUG */
 #ifdef IKSD
@@ -1100,7 +1106,7 @@ a {
     if (ikdbopen) slotstate(what,"REMOTE HELP", "", "");
 #endif /* IKSDB */
 #ifndef NOSERVER
-    if (sndhlp(NULL)) {
+    if (sndhlp()) {
 	BEGIN ssinit;			/* try to send it */
     } else {				/* If not ok, */
 	errpkt((CHAR *)"Can't send help"); /* send error message instead */
@@ -1351,6 +1357,15 @@ _PROTOTYP(int sndwho,(char *));
     rc = srv_query();
     debug(F101,"srv_query","",rc);
     if (rc > -1) return(rc);
+}
+
+<generic>M {				/* REMOTE MESSAGE command */
+#ifndef NOSERVER
+    debug(F110,"RMSG",(char *)srvcmd+2,0);
+    xxscreen(SCR_MS,0,0L,(char *)(srvcmd+2));
+    ack();
+    RESUME;
+#endif	/* NOSERVER */
 }
 
 <generic>q {				/* Interrupted or connection lost */
@@ -1679,8 +1694,14 @@ _PROTOTYP(int sndwho,(char *));
 <ssinit>Y {				/* ACK for Send-Init */
     spar(rdatap);			/* set parameters from it */
     cancel = 0;
-    bctu = bctr;			/* switch to agreed-upon block check */
-    bctl = (bctu == 4) ? 2 : bctu;	/* Set block-check length */
+    if (bctf) {
+	bctu = 3;
+	bctl = 3;
+    } else {
+	bctu = bctr;			/* switch to agreed-upon block check */
+	bctl = (bctu == 4) ? 2 : bctu;	/* Set block-check length */
+    }
+
 #ifdef CK_RESEND
     if ((sendmode == SM_RESEND) && (!atcapu || !rscapu)) { /* RESEND */
 	errpkt((CHAR *) "RESEND capabilities not negotiated");
@@ -2719,8 +2740,13 @@ rcv_s_pkt() {
 #endif /* CK_TMPDIR */
 	nakstate = 1;			/* Can send NAKs from here. */
 	rinit(rdatap);			/* Set parameters */
-	bctu = bctr;			/* Switch to agreed-upon block check */
-	bctl = (bctu == 4) ? 2 : bctu;	/* Set block-check length */
+	if (bctf) {
+	    bctu = 3;
+	    bctl = 3;
+	} else {
+	    bctu = bctr;	       /* switch to agreed-upon block check */
+	    bctl = (bctu == 4) ? 2 : bctu; /* Set block-check length */
+	}
 	what = W_RECV;			/* Remember we're receiving */
 	lastxfer = W_RECV;
 	resetc();			/* Reset counters */
@@ -3221,12 +3247,28 @@ _PROTOTYP( int pxyz, (int) );
 	}
 	if (!s) s = "";
 	if (*s) {
-	    if (sstate == 's') {
+	    if (sstate == 's') {	/* Sending */
+		extern int xfermode;
+		int k = 0, x = 0, b = binary;
+		/*
+		  If just one file we can scan it to set the xfer mode.
+		  Otherwise it's up to the external protocol program.
+		*/
+		if (patterns && xfermode == XMODE_A && !iswild(fspec)) {
+		    extern int nscanfile;
+		    k = scanfile(fspec,&x,nscanfile);
+		    if (k > -1) {
+			b = (k == FT_BIN) ? XYFT_B : XYFT_T;
+			s = b ?
+			    ptab[protocol].p_b_scmd :
+			    ptab[protocol].p_t_scmd;
+		    }
+		}
 		if ((int)strlen(s) + (int)strlen(fspec) < tmpbufsiz) {
 		    sprintf(tmpbuf,s,fspec); /* safe (prechecked) */
 		    tlog(F110,"Sending",fspec,0L);
 		}
-	    } else {
+	    } else {			/* Receiving */
 		if ((int)strlen(s) + (int)strlen(cmarg2) < tmpbufsiz) {
 		    sprintf(tmpbuf,s,cmarg2); /* safe (prechecked) */
 		    tlog(F110,"Receiving",cmarg2,0L);
