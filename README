@@ -5,3 +5,10 @@ inconsistent with the mainline cku*.* and ckc*.* files.  These files are
 kept as a fallback for version 5A of C-Kermit, which is much bigger.  There
 may be computers for which version 5A is too big, and version 4F will still
 fit...
+
+NOTE: This brnach contains an attempted port to Venix86. The compiler barfs
+"ckcfn2.c", line 304: compiler error: no table entry for op OREG
+which seems to be because it's run out of memory. This is with -O and without
+which is the usual fix for such conditions. One could try to split this
+file, I guess, but I don't need attribute packets. Anybody else attempting
+to use this on these now-ancient boxes has been warned.
