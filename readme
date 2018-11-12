@@ -1,0 +1,8 @@
+This branch contains a putative port to VENIX86.
+
+It's not been compiled yet, or tested. I prepared it because it was
+straight forward to do so from the 4F port. The 4F port can't compile
+with the stock compiler, I suspect due to memory issues. 5A is much
+larger, so more effort will be needed to get this to fit. the original
+minix is known not to fit, and it has a similar memory model. I'm not
+at all hopeful.
