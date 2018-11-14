@@ -3015,7 +3015,7 @@ provx1:
 
 #DEC Rainbow or IBM XT/AT with Venix/86 V2.0
 # Requires separate I/D space and a low, 8k stack. Otherwise
-# simplar to Pro version.
+# similar to Pro version.
 venix86:
 	make wart "CFLAGS= -DVENIX86 -DVENIX" "LNKFLAGS= "
 	make wermit "CFLAGS = -DVENIX86 -DVENIX -DNOFILEH -z -i -O" \

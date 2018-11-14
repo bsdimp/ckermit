@@ -1,8 +1,16 @@
 This branch contains a putative port to VENIX86.
 
-It's not been compiled yet, or tested. I prepared it because it was
-straight forward to do so from the 4F port. The 4F port can't compile
-with the stock compiler, I suspect due to memory issues. 5A is much
-larger, so more effort will be needed to get this to fit. the original
-minix is known not to fit, and it has a similar memory model. I'm not
-at all hopeful.
+This contains a port for version 5A to venix.  As currently
+configured, it's simply too big.  The makefile is too big. About a
+third of the files don't compile due to space issues or some compile
+problem. The rest that do already add up to over 64k once libc is
+taken into account.
+
+To run this version would require some serious thinning of kermit
+somewhere, as well as some fixups to the code.
+
+For at least the Rainbow version, it's unclear if there's a tangible
+benefit of this release over prior releases. The UART and/or ca driver
+effecitvely limit us to < 200cps/2400 baud regardless of the version
+of kermit, so time would better be spent there as I know under DOS we
+can get 9600 baud transfer rates.

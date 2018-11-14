@@ -138,9 +138,20 @@ ckudia.$(EXT): ckudia.c ckcker.h ckcdeb.h ckucmd.h ckcasc.h ckcsym.h
 
 ckuscr.$(EXT): ckuscr.c ckcker.h ckcdeb.h ckcasc.h ckcsym.h
 
+#DEC Pro-3xx with Pro/Venix V1.0 or V1.1
+# Requires code-mapping on non-I&D-space 11/23 processor, plus some
+# fiddling to get interrupt targets into resident code section.
+# This almost certainly doesn't work any more.
+provx1:
+	@echo 'Making C-Kermit $(CKVER) for DEC Pro-3xx, Pro/Venix 1.x...'
+	$(MAKE) wart "CFLAGS= -DPROVX1 -DVENIX $(KFLAGS)" "LNKFLAGS= "
+	$(MAKE) wermit "CFLAGS = -DPROVX1 -DNOFILEH -md780 -DVENIX" \
+		"LNKFLAGS= -u _sleep -lc -md780"
+
 #DEC Rainbow or IBM XT/AT with Venix/86 V2.0
 # Requires separate I/D space and a low, 8k stack. Otherwise
-# simplar to Pro version.
+# similar to Pro version. -- fails to build presently
+# and what does build is already too big.
 venix86:
 	make wart "CFLAGS= -DVENIX86 -DVENIX" "LNKFLAGS= "
 	make wermit "CFLAGS = -DVENIX86 -DVENIX -DNOFILEH -z -i -O" \
